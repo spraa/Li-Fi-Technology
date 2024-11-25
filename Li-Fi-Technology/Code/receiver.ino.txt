@@ -1,0 +1,40 @@
+// Receiver Code for Li-Fi
+
+const int ldrPin = A0;  // Pin connected to the photoresistor (LDR)
+String receivedMessage = ""; // String to store received message
+int threshold = 500;  // LDR threshold value for detecting light
+int delayTime = 500; // Delay for each bit
+
+void setup() {
+  pinMode(ldrPin, INPUT);
+  Serial.begin(9600);
+  Serial.println("Li-Fi Receiver Started");
+}
+
+void loop() {
+  receivedMessage = "";  // Clear previous message
+  // Read data from LDR and decode it
+  for (int i = 0; i < 5; i++) {  // Read 5 characters (example length)
+    char decodedChar = receiveCharacter();
+    receivedMessage += decodedChar;
+    Serial.print("Received: ");
+    Serial.println(decodedChar);
+  }
+  Serial.print("Full Message: ");
+  Serial.println(receivedMessage);
+  delay(2000); // Wait before receiving the next message
+}
+
+char receiveCharacter() {
+  char decodedChar = 0;
+  for (int bit = 7; bit >= 0; bit--) {
+    int lightValue = analogRead(ldrPin);
+    if (lightValue > threshold) {
+      decodedChar |= (1 << bit);  // Set bit to 1
+    } else {
+      decodedChar &= ~(1 << bit);  // Set bit to 0
+    }
+    delay(delayTime);  // Delay for each bit
+  }
+  return decodedChar;
+}

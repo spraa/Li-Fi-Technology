@@ -1,0 +1,33 @@
+// Transmitter Code for Li-Fi
+
+const int ledPin = 13;  // Pin connected to LED (transmitter)
+String message = "HELLO"; // Message to transmit (ASCII format)
+int delayTime = 500; // Delay between each character
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("Li-Fi Transmitter Started");
+}
+
+void loop() {
+  for (int i = 0; i < message.length(); i++) {
+    char character = message[i];
+    sendCharacter(character);
+  }
+  delay(2000); // Wait before retransmitting the message
+}
+
+void sendCharacter(char character) {
+  // Convert the character to binary and transmit via LED
+  for (int bit = 7; bit >= 0; bit--) {
+    int bitValue = (character >> bit) & 1;
+    if (bitValue == 1) {
+      digitalWrite(ledPin, HIGH);  // LED ON for 1
+    } else {
+      digitalWrite(ledPin, LOW);   // LED OFF for 0
+    }
+    delay(delayTime);  // Delay for each bit
+  }
+  delay(100);  // Small delay between characters
+}
